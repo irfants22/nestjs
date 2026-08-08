@@ -5,7 +5,13 @@ import { UserValidation } from './user.validation';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../common/prisma.service';
 import { ValidationService } from '../common/validation.service';
-import { RegisterUserRequest, UserResponse } from '../model/user.model';
+import {
+  LoginUserRequest,
+  RegisterUserRequest,
+  UserResponse,
+} from '../model/user.model';
+import * as crypto from 'crypto';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class UserService {
@@ -45,6 +51,57 @@ export class UserService {
     return {
       username: user.username,
       name: user.name,
+    };
+  }
+
+  async login(request: LoginUserRequest): Promise<UserResponse> {
+    this.logger.info(`UserService.login(${JSON.stringify(request)})`);
+
+    const validatedRequest = this.validationService.validate(
+      UserValidation.LOGIN,
+      request,
+    );
+
+    let user = await this.prismaService.user.findUnique({
+      where: {
+        username: validatedRequest.username,
+      },
+    });
+
+    if (!user) {
+      throw new HttpException('Username or password is invalid', 401);
+    }
+
+    const isPasswordValid = await bcrypt.compare(
+      validatedRequest.password,
+      user.password,
+    );
+
+    if (!isPasswordValid) {
+      throw new HttpException('Username or password is invalid', 401);
+    }
+
+    user = await this.prismaService.user.update({
+      where: {
+        username: validatedRequest.username,
+      },
+      data: {
+        token: crypto.randomUUID(),
+      },
+    });
+
+    return {
+      name: user.name,
+      username: user.username,
+      token: user.token,
+    };
+  }
+
+  async get(user: User): Promise<UserResponse> {
+    return {
+      name: user.name,
+      username: user.username,
+      token: user.token,
     };
   }
 }
