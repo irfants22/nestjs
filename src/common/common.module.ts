@@ -4,6 +4,7 @@ import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
 import { PrismaService } from './prisma.service';
 import { ValidationService } from './validation.service';
+import { ErrorFilter } from './error.filter';
 
 @Global()
 @Module({
@@ -16,7 +17,14 @@ import { ValidationService } from './validation.service';
       transports: [new winston.transports.Console()],
     }),
   ],
-  providers: [PrismaService, ValidationService],
+  providers: [
+    PrismaService,
+    ValidationService,
+    {
+      provide: 'APP_FILTER',
+      useClass: ErrorFilter,
+    },
+  ],
   exports: [PrismaService, ValidationService],
 })
 export class CommonModule {}
