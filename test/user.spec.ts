@@ -144,4 +144,35 @@ describe('UserController', () => {
       expect(response.body.data.name).toBe('test');
     });
   });
+
+  describe('PUT /api/users/me', () => {
+    beforeEach(async () => {
+      await testService.deleteUser();
+      await testService.createUser();
+    });
+
+    it('should be rejected if request is invalid', async () => {
+      const response = await request(app.getHttpServer())
+        .put('/api/users/me')
+        .set('Authorization', 'test')
+        .send({ name: '' });
+
+      logger.info(response.body);
+
+      expect(response.status).toBe(400);
+      expect(response.body.errors).toBeDefined();
+    });
+
+    it('should be able to update user name', async () => {
+      const response = await request(app.getHttpServer())
+        .put('/api/users/me')
+        .set('Authorization', 'test')
+        .send({ name: 'test updated' });
+
+      logger.info(response.body);
+
+      expect(response.status).toBe(200);
+      expect(response.body.data.name).toBe('test updated');
+    });
+  });
 });

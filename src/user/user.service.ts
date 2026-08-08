@@ -8,6 +8,7 @@ import { ValidationService } from '../common/validation.service';
 import {
   LoginUserRequest,
   RegisterUserRequest,
+  UpdateUserRequest,
   UserResponse,
 } from '../model/user.model';
 import * as crypto from 'crypto';
@@ -22,7 +23,7 @@ export class UserService {
   ) {}
 
   async register(request: RegisterUserRequest): Promise<UserResponse> {
-    this.logger.info(`Register new user ${JSON.stringify(request)}`);
+    this.logger.debug(`Register new user ${JSON.stringify(request)}`);
 
     const validatedRequest = this.validationService.validate(
       UserValidation.REGISTER,
@@ -55,7 +56,7 @@ export class UserService {
   }
 
   async login(request: LoginUserRequest): Promise<UserResponse> {
-    this.logger.info(`UserService.login(${JSON.stringify(request)})`);
+    this.logger.debug(`UserService.login(${JSON.stringify(request)})`);
 
     const validatedRequest = this.validationService.validate(
       UserValidation.LOGIN,
@@ -102,6 +103,31 @@ export class UserService {
       name: user.name,
       username: user.username,
       token: user.token,
+    };
+  }
+
+  async update(user: User, request: UpdateUserRequest): Promise<UserResponse> {
+    this.logger.debug(
+      `UserService.update( ${JSON.stringify(user)} , ${JSON.stringify(request)} )`,
+    );
+
+    const validatedRequest = this.validationService.validate(
+      UserValidation.UPDATE,
+      request,
+    );
+
+    if (validatedRequest.name) {
+      user.name = validatedRequest.name;
+    }
+
+    const result = await this.prismaService.user.update({
+      where: { username: user.username },
+      data: user,
+    });
+
+    return {
+      name: result.name,
+      username: result.username,
     };
   }
 }
