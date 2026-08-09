@@ -1,4 +1,12 @@
-import { Body, Controller, Get, HttpCode, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import {
   LoginUserRequest,
@@ -54,6 +62,15 @@ export class UserController {
     const result = await this.userService.update(user, request);
     return {
       data: result,
+    };
+  }
+
+  @Delete('/me')
+  @HttpCode(200)
+  async logout(@Auth() user: User): Promise<WebResponse<boolean>> {
+    await this.userService.logout(user);
+    return {
+      data: true,
     };
   }
 }
