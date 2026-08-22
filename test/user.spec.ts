@@ -3,14 +3,11 @@ import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
-import { Logger } from 'winston';
-import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { TestModule } from './test.module';
 import { TestService } from './test.service';
 
 describe('UserController', () => {
   let app: INestApplication<App>;
-  let logger: Logger;
   let testService: TestService;
 
   beforeEach(async () => {
@@ -21,7 +18,6 @@ describe('UserController', () => {
     app = moduleFixture.createNestApplication();
     await app.init();
 
-    logger = app.get(WINSTON_MODULE_PROVIDER);
     testService = app.get(TestService);
   });
 
@@ -39,8 +35,6 @@ describe('UserController', () => {
           name: '',
         });
 
-      logger.info(response.body);
-
       expect(response.status).toBe(400);
       expect(response.body.errors).toBeDefined();
     });
@@ -53,8 +47,6 @@ describe('UserController', () => {
           password: 'test',
           name: 'test',
         });
-
-      logger.info(response.body);
 
       expect(response.status).toBe(200);
       expect(response.body.data.username).toBe('test');
@@ -70,8 +62,6 @@ describe('UserController', () => {
           password: 'test',
           name: 'test',
         });
-
-      logger.info(response.body);
 
       expect(response.status).toBe(400);
       expect(response.body.errors).toBeDefined();
@@ -92,8 +82,6 @@ describe('UserController', () => {
           password: '',
         });
 
-      logger.info(response.body);
-
       expect(response.status).toBe(400);
       expect(response.body.errors).toBeDefined();
     });
@@ -105,8 +93,6 @@ describe('UserController', () => {
           username: 'test',
           password: 'test',
         });
-
-      logger.info(response.body);
 
       expect(response.status).toBe(200);
       expect(response.body.data.username).toBe('test');
@@ -126,8 +112,6 @@ describe('UserController', () => {
         .get('/api/users/me')
         .set('Authorization', 'invalid');
 
-      logger.info(response.body);
-
       expect(response.status).toBe(401);
       expect(response.body.errors).toBeDefined();
     });
@@ -136,8 +120,6 @@ describe('UserController', () => {
       const response = await request(app.getHttpServer())
         .get('/api/users/me')
         .set('Authorization', 'test');
-
-      logger.info(response.body);
 
       expect(response.status).toBe(200);
       expect(response.body.data.username).toBe('test');
@@ -157,8 +139,6 @@ describe('UserController', () => {
         .set('Authorization', 'test')
         .send({ name: '' });
 
-      logger.info(response.body);
-
       expect(response.status).toBe(400);
       expect(response.body.errors).toBeDefined();
     });
@@ -168,8 +148,6 @@ describe('UserController', () => {
         .put('/api/users/me')
         .set('Authorization', 'test')
         .send({ name: 'test updated' });
-
-      logger.info(response.body);
 
       expect(response.status).toBe(200);
       expect(response.body.data.name).toBe('test updated');
@@ -187,8 +165,6 @@ describe('UserController', () => {
         .delete('/api/users/me')
         .set('Authorization', 'invalid');
 
-      logger.info(response.body);
-
       expect(response.status).toBe(401);
       expect(response.body.errors).toBeDefined();
     });
@@ -197,8 +173,6 @@ describe('UserController', () => {
       const response = await request(app.getHttpServer())
         .delete('/api/users/me')
         .set('Authorization', 'test');
-
-      logger.info(response.body);
 
       expect(response.status).toBe(200);
       expect(response.body.data).toBe(true);
