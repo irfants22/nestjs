@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   Param,
@@ -57,6 +58,18 @@ export class ContactController {
     const result = await this.contactService.update(user, request);
     return {
       data: result,
+    };
+  }
+
+  @Delete('/:contactId')
+  @HttpCode(200)
+  async delete(
+    @Auth() user: User,
+    @Param('contactId', ParseIntPipe) contactId: number,
+  ): Promise<WebResponse<boolean>> {
+    await this.contactService.delete(user, contactId);
+    return {
+      data: true,
     };
   }
 }

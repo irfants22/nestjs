@@ -88,4 +88,26 @@ export class ContactService {
 
     return this.toContactResponse(contact);
   }
+
+  async delete(user: User, contactId: number): Promise<ContactResponse> {
+    const isContactExist = await this.prismaService.contact.findFirst({
+      where: {
+        id: contactId,
+        username: user.username,
+      },
+    });
+
+    if (!isContactExist) {
+      throw new HttpException('Contact is not found', 404);
+    }
+
+    const contact = await this.prismaService.contact.delete({
+      where: {
+        username: user.username,
+        id: isContactExist.id,
+      },
+    });
+
+    return this.toContactResponse(contact);
+  }
 }
