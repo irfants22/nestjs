@@ -3,7 +3,11 @@ import { PrismaService } from '../common/prisma.service';
 import { ValidationService } from '../common/validation.service';
 
 import { Contact, User } from '@prisma/client';
-import { ContactResponse, CreateContactRequest } from '../model/contact.model';
+import {
+  ContactResponse,
+  CreateContactRequest,
+  UpdateContactRequest,
+} from '../model/contact.model';
 import { ContactValidation } from './contact.validation';
 
 @Injectable()
@@ -53,6 +57,34 @@ export class ContactService {
     if (!contact) {
       throw new HttpException('Contact is not found', 404);
     }
+
+    return this.toContactResponse(contact);
+  }
+
+  async update(
+    user: User,
+    request: UpdateContactRequest,
+  ): Promise<ContactResponse> {
+    const validatedRequest = this.validationService.validate(
+      ContactValidation.UPDATE,
+      request,
+    );
+
+    const isContactExist = await this.prismaService.contact.findFirst({
+      where: {
+        id: validatedRequest.id,
+        username: user.username,
+      },
+    });
+
+    if (!isContactExist) {
+      throw new HttpException('Contact is not found', 404);
+    }
+
+    const contact = await this.prismaService.contact.update({
+      where: { username: user.username, id: isContactExist.id },
+      data: validatedRequest,
+    });
 
     return this.toContactResponse(contact);
   }

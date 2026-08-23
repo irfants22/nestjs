@@ -12,3 +12,9 @@ export class CreateContactRequest {
   email?: string;
   phone?: string;
 }
+
+export class UpdateContactRequest {
+  id!: number;
+  first_name?: string;
+  last_name?: string;
+}
