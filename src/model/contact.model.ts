@@ -18,3 +18,11 @@ export class UpdateContactRequest {
   first_name?: string;
   last_name?: string;
 }
+
+export class SearchContactRequest {
+  name?: string;
+  email?: string;
+  phone?: string;
+  page!: number;
+  size!: number;
+}

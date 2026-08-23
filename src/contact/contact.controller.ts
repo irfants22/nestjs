@@ -8,6 +8,7 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { ContactService } from './contact.service';
 import { Auth } from '../common/auth.decorator';
@@ -15,6 +16,7 @@ import type { User } from '@prisma/client';
 import {
   ContactResponse,
   CreateContactRequest,
+  SearchContactRequest,
   UpdateContactRequest,
 } from '../model/contact.model';
 import { WebResponse } from '../model/web.model';
@@ -71,5 +73,26 @@ export class ContactController {
     return {
       data: true,
     };
+  }
+
+  @Get()
+  @HttpCode(200)
+  async search(
+    @Auth() user: User,
+    @Query('name') name?: string,
+    @Query('email') email?: string,
+    @Query('phone') phone?: string,
+    @Query('page', new ParseIntPipe({ optional: true })) page?: number,
+    @Query('size', new ParseIntPipe({ optional: true })) size?: number,
+  ): Promise<WebResponse<ContactResponse[]>> {
+    const request: SearchContactRequest = {
+      name,
+      email,
+      phone,
+      page: page || 1,
+      size: size || 10,
+    };
+    const result = await this.contactService.search(user, request);
+    return result;
   }
 }
