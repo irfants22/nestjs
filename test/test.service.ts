@@ -1,13 +1,30 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../src/common/prisma.service';
 import * as bcrypt from 'bcrypt';
-import { Contact } from '@prisma/client';
 
 @Injectable()
 export class TestService {
   constructor(private prismaService: PrismaService) {}
 
+  async deleteAll() {
+    await this.deleteAddress();
+    await this.deleteContact();
+    await this.deleteUser();
+  }
+
+  async deleteAddress() {
+    await this.prismaService.address.deleteMany({
+      where: {
+        contact: {
+          username: 'test',
+        },
+      },
+    });
+  }
+
   async deleteContact() {
+    await this.deleteAddress();
+
     await this.prismaService.contact.deleteMany({
       where: {
         username: 'test',
@@ -16,6 +33,8 @@ export class TestService {
   }
 
   async deleteUser() {
+    await this.deleteAddress();
+
     await this.deleteContact();
 
     await this.prismaService.user.deleteMany({
