@@ -91,7 +91,7 @@ export class UserService {
     };
   }
 
-  async get(user: User): Promise<UserResponse> {
+  get(user: User): UserResponse {
     return {
       name: user.name,
       username: user.username,

@@ -46,8 +46,8 @@ export class UserController {
 
   @Get('/me')
   @HttpCode(200)
-  async get(@Auth() user: User): Promise<WebResponse<UserResponse>> {
-    const result = await this.userService.get(user);
+  get(@Auth() user: User): WebResponse<UserResponse> {
+    const result = this.userService.get(user);
     return {
       data: result,
     };

@@ -8,7 +8,6 @@ import {
   ParseIntPipe,
   Post,
   Put,
-  Query,
 } from '@nestjs/common';
 import { Auth } from '../common/auth.decorator';
 import type { User } from '@prisma/client';
