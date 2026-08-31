@@ -30,3 +30,8 @@ export class UpdateAddressRequest {
   country?: string | null;
   postal_code?: string | null;
 }
+
+export class DeleteAddressRequest {
+  contact_id!: number;
+  address_id!: number;
+}

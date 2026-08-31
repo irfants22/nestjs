@@ -4,6 +4,7 @@ import { ValidationService } from '../common/validation.service';
 import {
   AddressResponse,
   CreateAddressRequest,
+  DeleteAddressRequest,
   GetAddressRequest,
   UpdateAddressRequest,
 } from '../model/address.model';
@@ -122,5 +123,32 @@ export class AddressService {
     });
 
     return this.toAddressResponse(address);
+  }
+
+  async delete(
+    user: User,
+    request: DeleteAddressRequest,
+  ): Promise<AddressResponse> {
+    const validatedRequest = this.validationService.validate(
+      AddressValidation.DELETE,
+      request,
+    );
+
+    await this.contactService.checkContactMustExist(
+      validatedRequest.contact_id,
+      user.username,
+    );
+
+    const address = await this.checkAddressMustExist(
+      validatedRequest.address_id,
+      validatedRequest.contact_id,
+    );
+
+    return await this.prismaService.address.delete({
+      where: {
+        id: address.id,
+        contact_id: address.contact_id,
+      },
+    });
   }
 }
