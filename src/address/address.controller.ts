@@ -8,6 +8,7 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { Auth } from '../common/auth.decorator';
 import type { User } from '@prisma/client';
@@ -84,6 +85,18 @@ export class AddressController {
     await this.addressService.delete(user, request);
     return {
       data: true,
+    };
+  }
+
+  @Get()
+  @HttpCode(200)
+  async search(
+    @Auth() user: User,
+    @Param('contactId', ParseIntPipe) contactId: number,
+  ): Promise<WebResponse<AddressResponse[]>> {
+    const result = await this.addressService.list(user, contactId);
+    return {
+      data: result,
     };
   }
 }

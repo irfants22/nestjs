@@ -249,43 +249,39 @@ describe('AddressController', () => {
     });
   });
 
-  //   describe('GET /api/contacts/:contactId/addresses', () => {
-  //     beforeEach(async () => {
-  //       await testService.deleteAll();
+  describe('GET /api/contacts/:contactId/addresses', () => {
+    beforeEach(async () => {
+      await testService.deleteAll();
 
-  //       await testService.createUser();
-  //       await testService.createContact();
-  //       await testService.createAddress();
-  //     });
+      await testService.createUser();
+      await testService.createContact();
+      await testService.createAddress();
+    });
 
-  //     it('should be rejected if contact is not found', async () => {
-  //       const contact = await testService.getContact();
-  //       const response = await request(app.getHttpServer())
-  //         .get(`/api/contacts/${contact.id + 1}/addresses`)
-  //         .set('Authorization', 'test');
+    it('should be rejected if contact is not found', async () => {
+      const contact = await testService.getContact();
+      const response = await request(app.getHttpServer())
+        .get(`/api/contacts/${contact!.id + 1}/addresses`)
+        .set('Authorization', 'test');
 
-  //
+      expect(response.status).toBe(404);
+      expect(response.body.errors).toBeDefined();
+    });
 
-  //       expect(response.status).toBe(404);
-  //       expect(response.body.errors).toBeDefined();
-  //     });
+    it('should be able to list address', async () => {
+      const contact = await testService.getContact();
+      const response = await request(app.getHttpServer())
+        .get(`/api/contacts/${contact!.id}/addresses`)
+        .set('Authorization', 'test');
 
-  //     it('should be able to list address', async () => {
-  //       const contact = await testService.getContact();
-  //       const response = await request(app.getHttpServer())
-  //         .get(`/api/contacts/${contact.id}/addresses`)
-  //         .set('Authorization', 'test');
-
-  //
-
-  //       expect(response.status).toBe(200);
-  //       expect(response.body.data.length).toBe(1);
-  //       expect(response.body.data[0].id).toBeDefined();
-  //       expect(response.body.data[0].street).toBe('street test');
-  //       expect(response.body.data[0].city).toBe('city test');
-  //       expect(response.body.data[0].province).toBe('province test');
-  //       expect(response.body.data[0].country).toBe('country test');
-  //       expect(response.body.data[0].postal_code).toBe('1111');
-  //     });
-  //   });
+      expect(response.status).toBe(200);
+      expect(response.body.data.length).toBe(1);
+      expect(response.body.data[0].id).toBeDefined();
+      expect(response.body.data[0].street).toBe('street test');
+      expect(response.body.data[0].city).toBe('city test');
+      expect(response.body.data[0].province).toBe('province test');
+      expect(response.body.data[0].country).toBe('country test');
+      expect(response.body.data[0].postal_code).toBe('1111');
+    });
+  });
 });

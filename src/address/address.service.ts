@@ -139,16 +139,28 @@ export class AddressService {
       user.username,
     );
 
-    const address = await this.checkAddressMustExist(
+    let address = await this.checkAddressMustExist(
       validatedRequest.address_id,
       validatedRequest.contact_id,
     );
 
-    return await this.prismaService.address.delete({
+    address = await this.prismaService.address.delete({
       where: {
         id: address.id,
         contact_id: address.contact_id,
       },
     });
+
+    return this.toAddressResponse(address);
+  }
+
+  async list(user: User, contactId: number): Promise<AddressResponse[]> {
+    await this.contactService.checkContactMustExist(contactId, user.username);
+
+    const addresses = await this.prismaService.address.findMany({
+      where: { contact_id: contactId },
+    });
+
+    return addresses.map((address) => this.toAddressResponse(address));
   }
 }
