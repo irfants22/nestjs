@@ -68,59 +68,53 @@ describe('AddressController', () => {
     });
   });
 
-  //   describe('GET /api/contacts/:contactId/addresses/:addressId', () => {
-  //     beforeEach(async () => {
-  //       await testService.deleteAll();
+  describe('GET /api/contacts/:contactId/addresses/:addressId', () => {
+    beforeEach(async () => {
+      await testService.deleteAll();
 
-  //       await testService.createUser();
-  //       await testService.createContact();
-  //       await testService.createAddress();
-  //     });
+      await testService.createUser();
+      await testService.createContact();
+      await testService.createAddress();
+    });
 
-  //     it('should be rejected if contact is not found', async () => {
-  //       const contact = await testService.getContact();
-  //       const address = await testService.getAddress();
-  //       const response = await request(app.getHttpServer())
-  //         .get(`/api/contacts/${contact.id + 1}/addresses/${address.id}`)
-  //         .set('Authorization', 'test');
+    it('should be rejected if contact is not found', async () => {
+      const contact = await testService.getContact();
+      const address = await testService.getAddress();
+      const response = await request(app.getHttpServer())
+        .get(`/api/contacts/${contact!.id + 1}/addresses/${address!.id}`)
+        .set('Authorization', 'test');
 
-  //
+      expect(response.status).toBe(404);
+      expect(response.body.errors).toBeDefined();
+    });
 
-  //       expect(response.status).toBe(404);
-  //       expect(response.body.errors).toBeDefined();
-  //     });
+    it('should be rejected if address is not found', async () => {
+      const contact = await testService.getContact();
+      const address = await testService.getAddress();
+      const response = await request(app.getHttpServer())
+        .get(`/api/contacts/${contact!.id}/addresses/${address!.id + 1}`)
+        .set('Authorization', 'test');
 
-  //     it('should be rejected if address is not found', async () => {
-  //       const contact = await testService.getContact();
-  //       const address = await testService.getAddress();
-  //       const response = await request(app.getHttpServer())
-  //         .get(`/api/contacts/${contact.id}/addresses/${address.id + 1}`)
-  //         .set('Authorization', 'test');
+      expect(response.status).toBe(404);
+      expect(response.body.errors).toBeDefined();
+    });
 
-  //
+    it('should be able to get address', async () => {
+      const contact = await testService.getContact();
+      const address = await testService.getAddress();
+      const response = await request(app.getHttpServer())
+        .get(`/api/contacts/${contact!.id}/addresses/${address!.id}`)
+        .set('Authorization', 'test');
 
-  //       expect(response.status).toBe(404);
-  //       expect(response.body.errors).toBeDefined();
-  //     });
-
-  //     it('should be able to get address', async () => {
-  //       const contact = await testService.getContact();
-  //       const address = await testService.getAddress();
-  //       const response = await request(app.getHttpServer())
-  //         .get(`/api/contacts/${contact.id}/addresses/${address.id}`)
-  //         .set('Authorization', 'test');
-
-  //
-
-  //       expect(response.status).toBe(200);
-  //       expect(response.body.data.id).toBeDefined();
-  //       expect(response.body.data.street).toBe('jalan test');
-  //       expect(response.body.data.city).toBe('kota test');
-  //       expect(response.body.data.province).toBe('provinsi test');
-  //       expect(response.body.data.country).toBe('negara test');
-  //       expect(response.body.data.postal_code).toBe('1111');
-  //     });
-  //   });
+      expect(response.status).toBe(200);
+      expect(response.body.data.id).toBeDefined();
+      expect(response.body.data.street).toBe('street test');
+      expect(response.body.data.city).toBe('city test');
+      expect(response.body.data.province).toBe('province test');
+      expect(response.body.data.country).toBe('country test');
+      expect(response.body.data.postal_code).toBe('1111');
+    });
+  });
 
   //   describe('PUT /api/contacts/:contactId/addresses/:addressId', () => {
   //     beforeEach(async () => {
@@ -158,10 +152,10 @@ describe('AddressController', () => {
   //         .put(`/api/contacts/${contact.id}/addresses/${address.id}`)
   //         .set('Authorization', 'test')
   //         .send({
-  //           street: 'jalan test',
-  //           city: 'kota test',
-  //           province: 'provinsi test',
-  //           country: 'negara test',
+  //           street: 'street test',
+  //           city: 'city test',
+  //           province: 'province test',
+  //           country: 'country test',
   //           postal_code: '1111',
   //         });
 
@@ -169,10 +163,10 @@ describe('AddressController', () => {
 
   //       expect(response.status).toBe(200);
   //       expect(response.body.data.id).toBeDefined();
-  //       expect(response.body.data.street).toBe('jalan test');
-  //       expect(response.body.data.city).toBe('kota test');
-  //       expect(response.body.data.province).toBe('provinsi test');
-  //       expect(response.body.data.country).toBe('negara test');
+  //       expect(response.body.data.street).toBe('street test');
+  //       expect(response.body.data.city).toBe('city test');
+  //       expect(response.body.data.province).toBe('province test');
+  //       expect(response.body.data.country).toBe('country test');
   //       expect(response.body.data.postal_code).toBe('1111');
   //     });
 
@@ -183,10 +177,10 @@ describe('AddressController', () => {
   //         .put(`/api/contacts/${contact.id + 1}/addresses/${address.id}`)
   //         .set('Authorization', 'test')
   //         .send({
-  //           street: 'jalan test',
-  //           city: 'kota test',
-  //           province: 'provinsi test',
-  //           country: 'negara test',
+  //           street: 'street test',
+  //           city: 'city test',
+  //           province: 'province test',
+  //           country: 'country test',
   //           postal_code: '1111',
   //         });
 
@@ -203,10 +197,10 @@ describe('AddressController', () => {
   //         .put(`/api/contacts/${contact.id}/addresses/${address.id + 1}`)
   //         .set('Authorization', 'test')
   //         .send({
-  //           street: 'jalan test',
-  //           city: 'kota test',
-  //           province: 'provinsi test',
-  //           country: 'negara test',
+  //           street: 'street test',
+  //           city: 'city test',
+  //           province: 'province test',
+  //           country: 'country test',
   //           postal_code: '1111',
   //         });
 
@@ -301,10 +295,10 @@ describe('AddressController', () => {
   //       expect(response.status).toBe(200);
   //       expect(response.body.data.length).toBe(1);
   //       expect(response.body.data[0].id).toBeDefined();
-  //       expect(response.body.data[0].street).toBe('jalan test');
-  //       expect(response.body.data[0].city).toBe('kota test');
-  //       expect(response.body.data[0].province).toBe('provinsi test');
-  //       expect(response.body.data[0].country).toBe('negara test');
+  //       expect(response.body.data[0].street).toBe('street test');
+  //       expect(response.body.data[0].city).toBe('city test');
+  //       expect(response.body.data[0].province).toBe('province test');
+  //       expect(response.body.data[0].country).toBe('country test');
   //       expect(response.body.data[0].postal_code).toBe('1111');
   //     });
   //   });

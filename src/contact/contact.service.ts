@@ -30,6 +30,21 @@ export class ContactService {
     };
   }
 
+  async checkContactMustExist(contactId: number, username: string) {
+    const contact = await this.prismaService.contact.findFirst({
+      where: {
+        id: contactId,
+        username: username,
+      },
+    });
+
+    if (!contact) {
+      throw new HttpException('Contact is not found', 404);
+    }
+
+    return contact;
+  }
+
   async create(
     user: User,
     request: CreateContactRequest,
@@ -50,17 +65,7 @@ export class ContactService {
   }
 
   async get(user: User, contactId: number): Promise<ContactResponse> {
-    const contact = await this.prismaService.contact.findFirst({
-      where: {
-        id: contactId,
-        username: user.username,
-      },
-    });
-
-    if (!contact) {
-      throw new HttpException('Contact is not found', 404);
-    }
-
+    const contact = await this.checkContactMustExist(contactId, user.username);
     return this.toContactResponse(contact);
   }
 
@@ -73,19 +78,13 @@ export class ContactService {
       request,
     );
 
-    const isContactExist = await this.prismaService.contact.findFirst({
-      where: {
-        id: validatedRequest.id,
-        username: user.username,
-      },
-    });
+    let contact = await this.checkContactMustExist(
+      validatedRequest.id,
+      user.username,
+    );
 
-    if (!isContactExist) {
-      throw new HttpException('Contact is not found', 404);
-    }
-
-    const contact = await this.prismaService.contact.update({
-      where: { username: user.username, id: isContactExist.id },
+    contact = await this.prismaService.contact.update({
+      where: { username: user.username, id: contact.id },
       data: validatedRequest,
     });
 
@@ -93,21 +92,12 @@ export class ContactService {
   }
 
   async delete(user: User, contactId: number): Promise<ContactResponse> {
-    const isContactExist = await this.prismaService.contact.findFirst({
-      where: {
-        id: contactId,
-        username: user.username,
-      },
-    });
+    let contact = await this.checkContactMustExist(contactId, user.username);
 
-    if (!isContactExist) {
-      throw new HttpException('Contact is not found', 404);
-    }
-
-    const contact = await this.prismaService.contact.delete({
+    contact = await this.prismaService.contact.delete({
       where: {
         username: user.username,
-        id: isContactExist.id,
+        id: contact.id,
       },
     });
 
