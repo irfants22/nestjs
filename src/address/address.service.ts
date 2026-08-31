@@ -5,6 +5,7 @@ import {
   AddressResponse,
   CreateAddressRequest,
   GetAddressRequest,
+  UpdateAddressRequest,
 } from '../model/address.model';
 import { Address, User } from '@prisma/client';
 import { AddressValidation } from './address.validation';
@@ -27,6 +28,24 @@ export class AddressService {
       country: address.country,
       postal_code: address.postal_code,
     };
+  }
+
+  async checkAddressMustExist(
+    addressId: number,
+    contactId: number,
+  ): Promise<Address> {
+    const address = await this.prismaService.address.findFirst({
+      where: {
+        id: addressId,
+        contact_id: contactId,
+      },
+    });
+
+    if (!address) {
+      throw new HttpException('Address not found', 404);
+    }
+
+    return address;
   }
 
   async create(
@@ -61,16 +80,46 @@ export class AddressService {
       user.username,
     );
 
-    const address = await this.prismaService.address.findFirst({
+    const address = await this.checkAddressMustExist(
+      validatedRequest.address_id,
+      validatedRequest.contact_id,
+    );
+
+    return this.toAddressResponse(address);
+  }
+
+  async update(
+    user: User,
+    request: UpdateAddressRequest,
+  ): Promise<AddressResponse> {
+    const validatedRequest = this.validationService.validate(
+      AddressValidation.UPDATE,
+      request,
+    );
+
+    await this.contactService.checkContactMustExist(
+      validatedRequest.contact_id,
+      user.username,
+    );
+
+    let address = await this.checkAddressMustExist(
+      validatedRequest.address_id,
+      validatedRequest.contact_id,
+    );
+
+    address = await this.prismaService.address.update({
       where: {
-        id: validatedRequest.address_id,
-        contact_id: validatedRequest.contact_id,
+        id: address.id,
+        contact_id: address.contact_id,
+      },
+      data: {
+        street: address.street,
+        city: address.city,
+        province: address.province,
+        country: address.country,
+        postal_code: address.postal_code,
       },
     });
-
-    if (!address) {
-      throw new HttpException('Address not found', 404);
-    }
 
     return this.toAddressResponse(address);
   }
